@@ -34,6 +34,14 @@
 </head>
 
 <body><!--$--><!--/$-->
+    <script>
+        document.addEventListener('click', function (event) {
+            const checkoutLink = event.target.closest('a[href*="checkout.nanocorp.so"]');
+            if (!checkoutLink) return;
+            event.preventDefault();
+            window.location.href = 'Nexutil.html';
+        });
+    </script>
     <script src="./NexUtil — Utility Software for IBM i, Windows &amp; Android_files/25kvgcvbp6c14.js.téléchargement"
         id="_R_" async=""></script>
     <script>(self.__next_f = self.__next_f || []).push([0])</script>
