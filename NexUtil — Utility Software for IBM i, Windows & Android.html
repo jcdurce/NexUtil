@@ -35,11 +35,27 @@
 
 <body><!--$--><!--/$-->
     <script>
+        function migrateNexUtilLinks() {
+            document.querySelectorAll('a[href*="nexutil.nanocorp.app"]').forEach(function (link) {
+                link.href = link.href.replace('https://nexutil.nanocorp.app', 'https://nexutil.netlify.app');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', migrateNexUtilLinks);
+        new MutationObserver(migrateNexUtilLinks).observe(document.documentElement, { childList: true, subtree: true });
+
         document.addEventListener('click', function (event) {
-            const checkoutLink = event.target.closest('a[href*="checkout.nanocorp.so"]');
-            if (!checkoutLink) return;
-            event.preventDefault();
-            window.location.href = 'Nexutil.html';
+            const link = event.target.closest('a');
+            if (!link) return;
+            if (link.href.includes('checkout.nanocorp.so')) {
+                event.preventDefault();
+                window.location.href = 'Nexutil.html';
+                return;
+            }
+            if (link.href.includes('nexutil.nanocorp.app')) {
+                event.preventDefault();
+                window.location.href = link.href.replace('https://nexutil.nanocorp.app', 'https://nexutil.netlify.app');
+            }
         });
     </script>
     <script src="./NexUtil — Utility Software for IBM i, Windows &amp; Android_files/25kvgcvbp6c14.js.téléchargement"

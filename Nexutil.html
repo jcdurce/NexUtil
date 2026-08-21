@@ -535,13 +535,13 @@
         showSuccess('Paiement traité avec succès ! Merci.');
         // Simuler un délai et redirection
         setTimeout(() => {
-          window.location.href = 'https://nexutil.nanocorp.app/?checkout=success';
+          window.location.href = 'https://nexutil.netlify.app/?checkout=success';
         }, 2000);
       }
     }
 
     function goBack() {
-      window.location.href = 'https://nexutil.nanocorp.app/?checkout=cancelled';
+      window.location.href = 'https://nexutil.netlify.app/?checkout=cancelled';
     }
 
     // Format du numéro de carte et détection du type
