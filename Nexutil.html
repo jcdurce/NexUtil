@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="google" content="notranslate">
+  <title>NexUtil-Inc - Paiement</title>
+  <link rel="shortcut icon" href="https://js.stripe.com/v3/favicon.ico">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 20px;
+    }
+
+    .header-content h1 {
+      font-size: 24px;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .product-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #fafafa;
+      border-radius: 6px;
+    }
+
+    .product-section h2 {
+      font-size: 16px;
+      color: #666;
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .product-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .product-name {
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: 500;
+      max-width: 60%;
+    }
+
+    .product-description {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .product-price {
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+
+    .order-summary {
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 6px;
+      margin-bottom: 30px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .summary-row.total {
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .payment-section {
+      margin-bottom: 30px;
+    }
+
+    .payment-section h3 {
+      font-size: 16px;
+      color: #1a1a1a;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: #1a1a1a;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .card-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .card-label-row label {
+      margin-bottom: 0;
+    }
+
+    .accepted-cards-image {
+      display: block;
+      width: 145px;
+      height: auto;
+      flex: 0 0 auto;
+    }
+
+    .card-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .card-input-wrapper input {
+      flex: 1;
+      padding-right: 60px;
+    }
+
+    .card-logos {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 4px;
+    }
+
+    .card-logo {
+      width: 40px;
+      height: 25px;
+      border-radius: 3px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #5b8fc9;
+      box-shadow: 0 0 0 3px rgba(91, 143, 201, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .button-primary {
+      background-color: #5b8fc9;
+      color: white;
+    }
+
+    .button-primary:hover {
+      background-color: #4a72a8;
+    }
+
+    .button-secondary {
+      background-color: #e0e0e0;
+      color: #1a1a1a;
+    }
+
+    .button-secondary:hover {
+      background-color: #d0d0d0;
+    }
+
+    .footer {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 20px;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .powered-by {
+      margin-top: 15px;
+      font-size: 11px;
+    }
+
+    .error-message {
+      background-color: #fee;
+      border-left: 4px solid #f66;
+      padding: 12px;
+      border-radius: 4px;
+      color: #c33;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .success-message {
+      background-color: #efe;
+      border-left: 4px solid #6f6;
+      padding: 12px;
+      border-radius: 4px;
+      color: #3c3;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .product-item {
+        flex-direction: column;
+      }
+
+      .button-container {
+        flex-direction: column;
+      }
+
+      .card-label-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- En-tête -->
+    <div class="header">
+      <div class="header-icon">🏢</div>
+      <div class="header-content">
+        <h1>NexUtil-Inc</h1>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <!-- Section produit -->
+    <div class="product-section">
+      <h2>Payer NexUtil-Inc</h2>
+      
+      <div class="product-item">
+        <div>
+          <div class="product-name">IBridge Sync — IBM i ↔ Windows File Transfer & Scheduler</div>
+          <div class="product-description">
+            Licence permanente par serveur pour NexUtil IBridgeSync : transfert de fichiers sécurisé entre IBM i IFS/bibliothèque native et serveur Windows, planification, authentification par certificat mutuel TLS 1.3, journalisation d'audit, synchronisation delta et 12 mois de mises à jour.
+          </div>
+        </div>
+        <div class="product-price">427,04 $CA</div>
+      </div>
+    </div>
+
+    <!-- Résumé de la commande -->
+    <div class="order-summary">
+      <div class="summary-row">
+        <span>Sous-total</span>
+        <span>427,04 $CA</span>
+      </div>
+      <div class="summary-row">
+        <span>Frais</span>
+        <span>0,00 $CA</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>427,04 $CA</span>
+      </div>
+    </div>
+
+    <!-- Section de paiement -->
+    <div class="payment-section">
+      <h3>Informations de paiement</h3>
+
+      <div class="form-group">
+        <label for="email">Adresse e-mail</label>
+        <input type="email" id="email" name="email" placeholder="exemple@email.com" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstname">Prénom</label>
+          <input type="text" id="firstname" name="firstname" placeholder="Jean" required>
+        </div>
+        <div class="form-group">
+          <label for="lastname">Nom</label>
+          <input type="text" id="lastname" name="lastname" placeholder="Dupont" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Adresse</label>
+        <input type="text" id="address" name="address" placeholder="123 Rue de la Paix" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">Ville</label>
+          <input type="text" id="city" name="city" placeholder="Montréal" required>
+        </div>
+        <div class="form-group">
+          <label for="postal">Code postal</label>
+          <input type="text" id="postal" name="postal" placeholder="H1A 1A1" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="country">Pays</label>
+        <select id="country" name="country" required>
+          <option value="">Sélectionner un pays</option>
+          <option value="CA">Canada</option>
+          <option value="US">États-Unis</option>
+          <option value="FR">France</option>
+          <option value="OTHER">Autre</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="card-label-row">
+          <label for="card">Numéro de carte de crédit</label>
+          <img class="accepted-cards-image" src="cards_list.jpg" alt="Cartes bancaires acceptées : Visa, Mastercard, American Express et Diners Club">
+        </div>
+        <div class="card-input-wrapper">
+          <input type="text" id="card" name="card" placeholder="1234 5678 9012 3456" maxlength="19" required>
+          <div class="card-logos" id="cardLogos">
+            <svg class="card-logo visa-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+              <rect width="48" height="32" rx="4" fill="#1A1F71"/>
+              <text x="24" y="20" font-size="10" font-weight="bold" fill="white" text-anchor="middle">VISA</text>
+            </svg>
+            <svg class="card-logo mastercard-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+              <rect width="48" height="32" rx="4" fill="white" stroke="#ddd" stroke-width="0.5"/>
+              <circle cx="18" cy="16" r="8" fill="#EB001B"/>
+              <circle cx="30" cy="16" r="8" fill="#F79E1B"/>
+            </svg>
+            <svg class="card-logo amex-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+              <rect width="48" height="32" rx="4" fill="#006FCF"/>
+              <text x="24" y="20" font-size="8" font-weight="bold" fill="white" text-anchor="middle">AMEX</text>
+            </svg>
+            <svg class="card-logo diners-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+              <rect width="48" height="32" rx="4" fill="#0079BE"/>
+              <text x="24" y="20" font-size="8" font-weight="bold" fill="white" text-anchor="middle">DINERS</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="expiry">Expiration (MM/AA)</label>
+          <input type="text" id="expiry" name="expiry" placeholder="12/25" maxlength="5" required>
+        </div>
+        <div class="form-group">
+          <label for="cvc">CVC</label>
+          <input type="text" id="cvc" name="cvc" placeholder="123" maxlength="4" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="button-container">
+      <button class="button button-secondary" onclick="goBack()">Retour</button>
+      <button class="button button-primary" onclick="submitPayment()">Payer 427,04 $CA</button>
+    </div>
+
+    <!-- Pied de page -->
+    <div class="footer">
+      <div>
+        Paiement sécurisé par Stripe • <a href="https://stripe.com/legal/end-users" target="_blank" style="color: #999; text-decoration: none;">Conditions d'utilisation</a> • 
+        <a href="https://stripe.com/privacy" target="_blank" style="color: #999; text-decoration: none;">Confidentialité</a>
+      </div>
+      <div class="powered-by">Propulsé par <strong>Stripe</strong></div>
+    </div>
+  </div>
+
+  <script>
+    // Validation du formulaire
+    function validateForm() {
+      const email = document.getElementById('email').value.trim();
+      const firstname = document.getElementById('firstname').value.trim();
+      const lastname = document.getElementById('lastname').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const postal = document.getElementById('postal').value.trim();
+      const country = document.getElementById('country').value;
+      const card = document.getElementById('card').value.trim();
+      const expiry = document.getElementById('expiry').value.trim();
+      const cvc = document.getElementById('cvc').value.trim();
+
+      // Validation email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showError('Veuillez entrer une adresse e-mail valide.');
+        return false;
+      }
+
+      // Validation champs obligatoires
+      if (!firstname || !lastname || !address || !city || !postal || !country) {
+        showError('Veuillez remplir tous les champs obligatoires.');
+        return false;
+      }
+
+      // Validation carte (simple)
+      if (card.replace(/\s/g, '').length < 13 || card.replace(/\s/g, '').length > 19) {
+        showError('Veuillez entrer un numéro de carte valide.');
+        return false;
+      }
+
+      // Validation expiration
+      const expiryRegex = /^\d{2}\/\d{2}$/;
+      if (!expiryRegex.test(expiry)) {
+        showError('Veuillez entrer la date d\'expiration au format MM/AA.');
+        return false;
+      }
+
+      // Validation CVC
+      if (cvc.length < 3 || cvc.length > 4 || !/^\d+$/.test(cvc)) {
+        showError('Veuillez entrer un CVC valide.');
+        return false;
+      }
+
+      return true;
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      setTimeout(() => {
+        successDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    function submitPayment() {
+      if (validateForm()) {
+        showSuccess('Paiement traité avec succès ! Merci.');
+        // Simuler un délai et redirection
+        setTimeout(() => {
+          window.location.href = 'https://nexutil.netlify.app/?checkout=success';
+        }, 2000);
+      }
+    }
+
+    function goBack() {
+      window.location.href = 'https://nexutil.netlify.app/?checkout=cancelled';
+    }
+
+    // Format du numéro de carte et détection du type
+    document.getElementById('card').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\s/g, '');
+      let formatted = '';
+      for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) formatted += ' ';
+        formatted += value[i];
+      }
+      e.target.value = formatted;
+
+      // Détection du type de carte
+      detectCardType(value);
+    });
+
+    // Fonction pour détecter le type de carte
+    function detectCardType(cardNumber) {
+      const visaLogo = document.querySelector('.visa-logo');
+      const mastercardLogo = document.querySelector('.mastercard-logo');
+      const amexLogo = document.querySelector('.amex-logo');
+      const dinersLogo = document.querySelector('.diners-logo');
+
+      // Masquer tous les logos
+      visaLogo.style.display = 'none';
+      mastercardLogo.style.display = 'none';
+      amexLogo.style.display = 'none';
+      dinersLogo.style.display = 'none';
+
+      // Afficher le logo correspondant au type de carte
+      if (cardNumber.length === 0) {
+        return;
+      }
+
+      const firstDigit = cardNumber[0];
+      const secondDigit = cardNumber[1];
+
+      if (firstDigit === '4') {
+        visaLogo.style.display = 'block'; // Visa
+      } else if (firstDigit === '5' && (secondDigit === '1' || secondDigit === '2' || secondDigit === '3' || secondDigit === '4' || secondDigit === '5')) {
+        mastercardLogo.style.display = 'block'; // Mastercard
+      } else if (firstDigit === '3' && (secondDigit === '4' || secondDigit === '7')) {
+        amexLogo.style.display = 'block'; // American Express (34 ou 37)
+      } else if (firstDigit === '3' && (secondDigit === '6' || secondDigit === '8')) {
+        dinersLogo.style.display = 'block'; // Diners Club
+      }
+    }
+
+    // Format de l'expiration
+    document.getElementById('expiry').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+      }
+      e.target.value = value;
+    });
+  </script>
+</body>
+
+</html>
